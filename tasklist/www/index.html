@@ -12,7 +12,7 @@
 <body>
     
     <h1>Tasklist</h1>
-    <button onclick="afegir">+</button>
+    <button id="afegir">+</button>
     <ul>
             <li>tasca</li>
     </ul>
@@ -21,8 +21,9 @@
         
     </div>
     <script>
+        const button = document.getElementById("afegir");
         dialog = $("#taskform").dialog({
-            autoOpen: true,
+            autoOpen: false,
             height: 200,
             width: 350,
             modal: true,
@@ -38,6 +39,9 @@
 
             }
         });
+         button.addEventListener("click", () => {
+        dialog.dialog("open");
+    });
     </script>
 </body>
 </html>
