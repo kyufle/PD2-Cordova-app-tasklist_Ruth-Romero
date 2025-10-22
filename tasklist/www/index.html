@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasklist</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="index.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 </head>
@@ -15,30 +14,52 @@
     <h1>Tasklist</h1>
     <button id="afegir">+</button>
 
-    <ul>
-            <li>tasca</li>
+    <ul id="tasques">
+        <li>Tasca 1</li>
     </ul>
+
+    <div id="taskform" title="Afegir nova tasca" style="display:none;">
+        <label for="task">Nom de la tasca:</label><br>
+        <input type="text" id="task" name="task"><br><br>
+        <button id="agregar">Afegir</button>
+        <button id="cancelar">Cancelar</button>
     </div>
 
     <script>
+        $(document).ready(function () {
+            $("#taskform").dialog({
+                autoOpen: false,
+                height: 200,
+                width: 350,
+                modal: true
+            });
 
-        const button = document.getElementById("afegir");
+            $("#afegir").click(function () {
+                $("#taskform").dialog("open");
+            });
 
-        dialog = $("#taskform").dialog({
-            autoOpen: false,
-            height: 200,
-            width: 350,
-            modal: true,
-            }
-        );
+            $("#agregar").click(function () {
+                const tasca = $("#task").val();
+                if (tasca != "") {
+                    $("#tasques").append("<div class='taskWithButtons'><p>"+tasca+"</p><button id='editar'>Editar</button><button id='esborrar'>Esborrar</button></div>");
+                    $("#task").val("");
+                    $("#taskform").dialog("close");
+                }
+            });
 
-
-         button.addEventListener("click", () => {
-            dialog.dialog("open");
+            $("#cancelar").click(function () {
+                $("#task").val("");
+                $("#taskform").dialog("close");
+            });
         });
+            $("#editar").click(function (){
+                
+            })
 
+            $("#esborrar").click(function (){
+                
+            })
     </script>
-
 </body>
 
 </html>
