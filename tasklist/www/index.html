@@ -1,47 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasklist</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link rel="stylesheet" href="index.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 </head>
-<body>
-    
+
+<body class="eliminando">
+
     <h1>Tasklist</h1>
     <button id="afegir">+</button>
+    <button id="eliminar">-</button>
+    <button id="confirmarEliminar">Confirmar eliminación</button>
     <ul>
-            <li>tasca</li>
     </ul>
     <div id="taskform" title="Nova tasca">
-        <input type="text" id="tasktext"/>
-        
+        <input type="text" id="tasktext" />
+
     </div>
     <script>
-        const button = document.getElementById("afegir");
+        const buttonOpenDialog = document.getElementById("afegir");
+        const eliminate = document.getElementById("eliminar");
+        const confirmarEliminar = document.getElementById("confirmarEliminar");
+
+        let tasks = [];
+        const render = () => {
+            $("ul").empty();
+            tasks.forEach((task) => {
+                $("ul").append(`<li class="${task.completed ? "completed" : ""}"><input type="checkbox" />${task.name}</li>`);
+            });
+        }
+        const createTask = (name) => {
+            tasks.push({
+                name: name,
+                completed: false,
+            });
+            saveLocalStorage();
+        }
+        const saveLocalStorage = () => {
+            localStorage.setItem("tareas", JSON.stringify(tasks));
+        }
+        const readLocalStorage = () => {
+            if (!localStorage.getItem("tareas")) {
+                return;
+            }
+            tasks = JSON.parse(localStorage.getItem("tareas"));
+        }
+
         dialog = $("#taskform").dialog({
             autoOpen: false,
             height: 200,
             width: 350,
             modal: true,
             buttons: {
-                "afegir": function() {
+                "afegir": function () {
                     text = $('#tasktext').val();
-                    $("ul").append("<li>"+text+"</li>");
+                    createTask(text);
+                    render();
+
                     dialog.dialog("close");
                 },
-                "cancelar": function() {
+                "cancelar": function () {
                     dialog.dialog("close");
                 },
 
             }
         });
-         button.addEventListener("click", () => {
-        dialog.dialog("open");
-    });
+        buttonOpenDialog.addEventListener("click", () => {
+            dialog.dialog("open");
+        });
+        confirmarEliminar.addEventListener("click", () => {
+            let tasklistElements = document.querySelectorAll("li input");
+            let removeList = [];
+            tasklistElements.forEach((element, index) => {
+                if (element.checked) {
+                    removeList.push(index);
+                }
+            })
+            removeList.reverse();
+            removeList.forEach((index) => {
+                tasks.splice(index, 1);
+            })
+            saveLocalStorage();
+            render();
+        })
+
+        readLocalStorage();
+        render();
     </script>
 </body>
+
 </html>
