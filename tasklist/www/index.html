@@ -6,59 +6,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasklist</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="index.css">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 </head>
 
 <body>
+
     <h1>Tasklist</h1>
     <button id="afegir">+</button>
-
-    <ul id="tasques">
-        <li>Tasca 1</li>
-    </ul>
-
-    <div id="taskform" title="Afegir nova tasca" style="display:none;">
-        <label for="task">Nom de la tasca:</label><br>
-        <input type="text" id="task" name="task"><br><br>
-        <button id="agregar">Afegir</button>
-        <button id="cancelar">Cancelar</button>
+    <button id="confirmarEliminar">Eliminar seleccionados</button>
+    <div class="lista">
     </div>
+    <div id="taskform" title="Nova tasca">
+        <input type="text" id="tasktext" />
 
+    </div>
     <script>
-        $(document).ready(function () {
-            $("#taskform").dialog({
-                autoOpen: false,
-                height: 200,
-                width: 350,
-                modal: true
-            });
+        const buttonOpenDialog = document.getElementById("afegir");
+        const eliminate = document.getElementById("eliminar");
+        const confirmarEliminar = document.getElementById("confirmarEliminar");
 
-            $("#afegir").click(function () {
-                $("#taskform").dialog("open");
-            });
+        let tasks = [];
+        const render = () => {
+            $(".lista").empty();
+            tasks.forEach((task, index) => {
+                const liElement = $(`<div class="${task.completed ? "completed" : ""}"></li>`)
+                $(".lista").append(liElement);
+                liElement.append(`<span>${task.name}</span>`)
+                const buttonEditElement = $("<button class=\"editar\">Editar</button>");
+                liElement.append(buttonEditElement);
+                const inputEditarElement = $('<input class="inputEditar" type="text" />');
+                liElement.append(inputEditarElement);
+                const buttonOkElement = $('<button class=\"ok\">OK</button>');
+                liElement.append(buttonOkElement);
+                liElement.append('<input class="checkBorrar" type="checkbox" />');
 
-            $("#agregar").click(function () {
-                const tasca = $("#task").val();
-                if (tasca != "") {
-                    $("#tasques").append("<div class='taskWithButtons'><p>"+tasca+"</p><button id='editar'>Editar</button><button id='esborrar'>Esborrar</button></div>");
-                    $("#task").val("");
-                    $("#taskform").dialog("close");
-                }
-            });
+                buttonEditElement.click(() => {
+                    inputEditarElement.val(task.name);
+                    liElement.addClass("editando");
+                })
 
-            $("#cancelar").click(function () {
-                $("#task").val("");
-                $("#taskform").dialog("close");
+                buttonOkElement.click(()=>{
+                    liElement.removeClass("editando");
+                    task.name = inputEditarElement.val();
+                    render();
+                })
             });
+        }
+        const createTask = (name) => {
+            tasks.push({
+                name: name,
+                completed: false,
+            });
+        }
+
+        dialog = $("#taskform").dialog({
+            autoOpen: false,
+            height: 200,
+            width: 350,
+            modal: true,
+            buttons: {
+                "afegir": function () {
+                    text = $('#tasktext').val();
+                    createTask(text);
+                    render();
+                    $('#tasktext').val("");
+                    dialog.dialog("close");
+                    
+                },
+                "cancelar": function () {
+                    dialog.dialog("close");
+                },
+
+            }
         });
-            $("#editar").click(function (){
-                
+        buttonOpenDialog.addEventListener("click", () => {
+            dialog.dialog("open");
+        });
+        confirmarEliminar.addEventListener("click", () => {
+            let tasklistElements = document.querySelectorAll("div.lista div input.checkBorrar");
+            let removeList = [];
+            tasklistElements.forEach((element, index) => {
+                if (element.checked) {
+                    removeList.push(index);
+                }
             })
+            removeList.reverse();
+            removeList.forEach((index) => {
+                tasks.splice(index, 1);
+            })
+            render();
+        })
 
-            $("#esborrar").click(function (){
-                
-            })
+        render();
     </script>
 </body>
 
