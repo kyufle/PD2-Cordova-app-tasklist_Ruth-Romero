@@ -51,6 +51,7 @@
                 buttonOkElement.click(()=>{
                     liElement.removeClass("editando");
                     task.name = inputEditarElement.val();
+                    saveLocalStorage();
                     render();
                 })
             });
@@ -60,6 +61,16 @@
                 name: name,
                 completed: false,
             });
+            saveLocalStorage();
+        }
+        const saveLocalStorage = () => {
+            localStorage.setItem("tareas", JSON.stringify(tasks));
+        }
+        const readLocalStorage = () => {
+            if (!localStorage.getItem("tareas")) {
+                return;
+            }
+            tasks = JSON.parse(localStorage.getItem("tareas"));
         }
 
         dialog = $("#taskform").dialog({
@@ -97,9 +108,10 @@
             removeList.forEach((index) => {
                 tasks.splice(index, 1);
             })
+            saveLocalStorage();
             render();
         })
-
+        readLocalStorage();
         render();
     </script>
 </body>
