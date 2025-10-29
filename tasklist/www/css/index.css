@@ -33,10 +33,35 @@ body {
     padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     width:100%;
 }
+body{
+    padding: 20px;
+}
 
+button#afegir, button#confirmarEliminar{
+    color: black;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 15px;
+}
 
-#confirmarEliminar {
-    display: none;
+button.editar, button.ok{
+    color: black;
+    background-color: white;
+    padding: 6px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+button#afegir:hover, button#confirmarEliminar:hover, button.editar:hover, button.ok:hover{
+    color: white;
+    background-color: black;
+}
+
+button.ok, input#checkBorrar, input.inputEditar{
+    margin-right: 10px;
 }
 
 .eliminando #confirmarEliminar {
@@ -49,4 +74,34 @@ ul li input {
 
 .eliminando ul li input {
     display: inline-block;
+}
+
+.inputEditar,
+.ok {
+  display: none;
+}
+
+.editando .inputEditar,
+.editando .ok {
+  display: inline-block;
+}
+
+.editando .editar {
+  display: none;
+}
+
+.editando span {
+  display: none;
+}
+
+span {
+    margin-right: 20px;
+}
+
+.editar {
+    margin-right: 10px;
+}
+
+.lista div{
+    margin-top: 10px;
 }
