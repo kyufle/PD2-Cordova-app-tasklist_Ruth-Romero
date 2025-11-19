@@ -4,7 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self' data: https://ssl.gstatic.com; 
+                   script-src 'self' 'unsafe-eval' https://code.jquery.com; 
+                   style-src 'self' 'unsafe-inline' https://code.jquery.com; 
+                   media-src *; 
+                   img-src 'self' data: content:;">
+    
     <title>Tasklist</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="css/index.css">
@@ -13,108 +19,14 @@
 </head>
 
 <body>
-
     <h1>Tasklist</h1>
     <button id="afegir">+</button>
     <button id="confirmarEliminar">Eliminar seleccionados</button>
     <div class="lista">
     </div>
-    </div>
     <div id="taskform" title="Nova tasca">
         <input type="text" id="tasktext" />
-
     </div>
-    <script>
-        const buttonOpenDialog = document.getElementById("afegir");
-        const eliminate = document.getElementById("eliminar");
-        const confirmarEliminar = document.getElementById("confirmarEliminar");
-
-        let tasks = [];
-        const render = () => {
-            $(".lista").empty();
-            tasks.forEach((task, index) => {
-                const liElement = $(`<div class="${task.completed ? "completed" : ""}"></li>`)
-                $(".lista").append(liElement);
-                liElement.append(`<span>${task.name}</span>`)
-                const buttonEditElement = $("<button class=\"editar\">Editar</button>");
-                liElement.append(buttonEditElement);
-                const inputEditarElement = $('<input class="inputEditar" type="text" />');
-                liElement.append(inputEditarElement);
-                const buttonOkElement = $('<button class=\"ok\">OK</button>');
-                liElement.append(buttonOkElement);
-                liElement.append('<input class="checkBorrar" type="checkbox" />');
-
-                buttonEditElement.click(() => {
-                    inputEditarElement.val(task.name);
-                    liElement.addClass("editando");
-                })
-
-                buttonOkElement.click(()=>{
-                    liElement.removeClass("editando");
-                    task.name = inputEditarElement.val();
-                    saveLocalStorage();
-                    render();
-                })
-            });
-        }
-        const createTask = (name) => {
-            tasks.push({
-                name: name,
-                completed: false,
-            });
-            saveLocalStorage();
-        }
-        const saveLocalStorage = () => {
-            localStorage.setItem("tareas", JSON.stringify(tasks));
-        }
-        const readLocalStorage = () => {
-            if (!localStorage.getItem("tareas")) {
-                return;
-            }
-            tasks = JSON.parse(localStorage.getItem("tareas"));
-        }
-
-        dialog = $("#taskform").dialog({
-            autoOpen: false,
-            height: 200,
-            width: 350,
-            modal: true,
-            buttons: {
-                "afegir": function () {
-                    text = $('#tasktext').val();
-                    createTask(text);
-                    render();
-                    $('#tasktext').val("");
-                    dialog.dialog("close");
-                    
-                },
-                "cancelar": function () {
-                    dialog.dialog("close");
-                },
-
-            }
-        });
-        buttonOpenDialog.addEventListener("click", () => {
-            dialog.dialog("open");
-        });
-        confirmarEliminar.addEventListener("click", () => {
-            let tasklistElements = document.querySelectorAll("div.lista div input.checkBorrar");
-            let removeList = [];
-            tasklistElements.forEach((element, index) => {
-                if (element.checked) {
-                    removeList.push(index);
-                }
-            })
-            removeList.reverse();
-            removeList.forEach((index) => {
-                tasks.splice(index, 1);
-            })
-            saveLocalStorage();
-            render();
-        })
-        readLocalStorage();
-        render();
-    </script>
+     <script src="js/index.js"></script>
 </body>
-
 </html>

@@ -22,8 +22,113 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
-    // Cordova is now initialized. Have fun!
-
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    document.getElementById('deviceready').classList.add('ready');
 }
+
+$(document).ready(function() {
+    console.log('Tasklist application initialized.');
+    let dialog; 
+
+    const buttonOpenDialog = document.getElementById("afegir");
+    const eliminate = document.getElementById("eliminar");
+    const confirmarEliminar = document.getElementById("confirmarEliminar");
+
+    let tasks = [];
+    const render = () => {
+        $(".lista").empty();
+        tasks.forEach((task, index) => {
+            const liElement = $(`<div class="${task.completed ? "completed" : ""}"></div>`); // Se corrige a </div>
+            $(".lista").append(liElement);
+            liElement.append(`<span>${task.name}</span>`);
+            const buttonEditElement = $("<button class=\"editar\">Editar</button>");
+            liElement.append(buttonEditElement);
+            const inputEditarElement = $('<input class="inputEditar" type="text" />');
+            liElement.append(inputEditarElement);
+            const buttonOkElement = $('<button class=\"ok\">OK</button>');
+            liElement.append(buttonOkElement);
+            liElement.append('<input class="checkBorrar" type="checkbox" />');
+
+            buttonEditElement.click(() => {
+                inputEditarElement.val(task.name);
+                liElement.addClass("editando");
+            })
+
+            buttonOkElement.click(()=>{
+                liElement.removeClass("editando");
+                task.name = inputEditarElement.val();
+                saveLocalStorage();
+                render();
+            })
+            liElement.children('span').click(() => { 
+                task.completed = !task.completed;
+                saveLocalStorage();
+                render();
+            });
+        });
+    }
+    const createTask = (name) => {
+        tasks.push({
+            name: name,
+            completed: false,
+        });
+        saveLocalStorage();
+    }
+    const saveLocalStorage = () => {
+        localStorage.setItem("tareas", JSON.stringify(tasks));
+    }
+    const readLocalStorage = () => {
+        if (!localStorage.getItem("tareas")) {
+            return;
+        }
+        tasks = JSON.parse(localStorage.getItem("tareas"));
+    }
+
+    dialog = $("#taskform").dialog({
+        autoOpen: false,
+        height: 200,
+        width: 350,
+        modal: true,
+        buttons: {
+            "afegir": function () {
+                const text = $('#tasktext').val();
+                if (text.trim()) { 
+                    createTask(text);
+                    render();
+                    $('#tasktext').val("");
+                    dialog.dialog("close");
+                }
+            },
+            "cancelar": function () {
+                dialog.dialog("close");
+            },
+
+        }
+    });
+    
+    if (buttonOpenDialog) {
+        buttonOpenDialog.addEventListener("click", () => {
+            dialog.dialog("open");
+        });
+    }
+    
+    if (confirmarEliminar) {
+        confirmarEliminar.addEventListener("click", () => {
+            let tasklistElements = document.querySelectorAll("div.lista div input.checkBorrar");
+            let removeList = [];
+            tasklistElements.forEach((element, index) => {
+                if (element.checked) {
+                    removeList.push(index);
+                }
+            })
+            removeList.reverse();
+            removeList.forEach((index) => {
+                tasks.splice(index, 1);
+            })
+            saveLocalStorage();
+            render();
+        })
+    }
+
+    readLocalStorage();
+    render();
+});
